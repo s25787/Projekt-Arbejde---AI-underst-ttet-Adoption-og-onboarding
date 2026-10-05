@@ -22,4 +22,4 @@ Webudgaven er klar til statisk HTTPS-hosting, også i undermapper. Service worke
 
 Se `TESTRESULTATER.md` for udførte tests. Screenshots er i `screenshots/`. Desktopbrowserens mobilviewports dokumenterer layout og touch-events, ikke installation på en fysisk iPhone. Manuel kontrol resterer: host på HTTPS, installer på fysisk iPhone/Android, genåbn fra hjemmeskærmen og kontroller offlinebrug samt tastatur/safe areas. Intet er publiceret.
 
-Skærmoversigten under appen viser alle 17 hoved- og underskærme. Scroll vandret, og klik på et kort for at indlæse trinnets demotilstand. Piletaster, Home/End og Enter kan også bruges. Valget kan simulere en allerede oplåst eller godkendt anmodning til præsentation; en ny anmodning kræver stadig ny oplåsning.
+Skærmoversigten under appen viser alle 16 hoved- og underskærme. Scroll vandret, og klik på et kort for at indlæse trinnets demotilstand. Piletaster, Home/End og Enter kan også bruges. Valget kan simulere en allerede oplåst eller godkendt anmodning til præsentation; en ny anmodning kræver stadig ny oplåsning.
