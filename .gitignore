@@ -1,0 +1,4 @@
+﻿node_modules/
+dist/
+.single-build/
+npm-debug.log*

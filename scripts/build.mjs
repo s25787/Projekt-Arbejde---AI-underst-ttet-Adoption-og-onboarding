@@ -1,0 +1,17 @@
+import {build} from 'vite';
+import {mkdir,readFile,writeFile,readdir} from 'node:fs/promises';
+import sharp from 'sharp';
+import {zipSync,strToU8} from 'fflate';
+await mkdir('public',{recursive:true});await mkdir('release',{recursive:true});
+const icon='<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><rect width="512" height="512" rx="100" fill="#850b18"/><g fill="white"><path d="M256 70 322 170 256 247 190 170Z M177 198 242 271 190 335 125 261Z M335 198 387 261 322 335 270 271Z M256 301 301 354 256 409 211 354Z"/></g></svg>';
+for(const [name,size] of [['icon-192.png',192],['icon-512.png',512],['apple-touch-icon.png',180]])await sharp(Buffer.from(icon)).resize(size,size).png().toFile('public/'+name);
+await writeFile('public/manifest.webmanifest',JSON.stringify({name:'IdrætsID – Demo',short_name:'IdrætsID',start_url:'./',scope:'./',display:'standalone',lang:'da',background_color:'#850b18',theme_color:'#850b18',icons:[{src:'./icon-192.png',sizes:'192x192',type:'image/png',purpose:'any'},{src:'./icon-512.png',sizes:'512x512',type:'image/png',purpose:'any'}]},null,2));
+await build({base:'./',build:{outDir:'dist'}});
+async function files(dir){let all=[];for(const f of await readdir(dir,{withFileTypes:true}))all.push(...(f.isDirectory()?await files(dir+'/'+f.name):[dir+'/'+f.name]));return all;}
+const assets=(await files('dist')).map(f=>'./'+f.slice(5));
+const version='idraetsid-demo-'+Date.now();
+await writeFile('dist/sw.js',`const CACHE=${JSON.stringify(version)};const ASSETS=${JSON.stringify(['./',...assets])};self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting()))});self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('idraetsid-demo-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});self.addEventListener('fetch',e=>{if(e.request.method!=='GET'||new URL(e.request.url).origin!==self.location.origin)return;e.respondWith(caches.match(e.request).then(c=>c||fetch(e.request).catch(()=>e.request.mode==='navigate'?caches.match('./index.html'):Response.error())))});`);
+await build({base:'./',build:{outDir:'.single-build',emptyOutDir:true,cssCodeSplit:false,rollupOptions:{input:'src/main.ts',output:{format:'iife',entryFileNames:'app.js',inlineDynamicImports:true,assetFileNames:'[name][extname]'}}}});
+const js=await readFile('.single-build/app.js','utf8'),css=await readFile('.single-build/main.css','utf8').catch(async()=>readFile('.single-build/style.css','utf8'));
+await writeFile('release/idraetsid-demo.html',`<!doctype html><html lang="da"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#850b18"><title>IdrætsID – Demo</title><style>${css}</style></head><body><div id="app"></div><script>${js.replace(/<\/script/gi,'<\\/script')}</script></body></html>`);
+const zip={};for(const dir of ['dist','src','scripts','tests','screenshots'])for(const f of await files(dir).catch(()=>[]))zip[f]=new Uint8Array(await readFile(f));for(const f of ['release/idraetsid-demo.html','README.md','BRUGERVEJLEDNING.md','TESTRESULTATER.md','package.json','package-lock.json','tsconfig.json','index.html'])try{zip[f]=new Uint8Array(await readFile(f));}catch{if(f!=='TESTRESULTATER.md')throw Error('Manglende fil: '+f);}await writeFile('release/idraetsid-mockup.zip',zipSync(zip,{level:6}));console.log('Webapp, selvstændig HTML og ZIP er bygget.');
