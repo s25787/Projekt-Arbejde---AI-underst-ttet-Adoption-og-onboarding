@@ -1,5 +1,13 @@
 # IdrætsID – studieprototype
 
+## GitHub Pages
+
+Siden publiceres automatisk fra `main` via `.github/workflows/pages.yml`. Workflowen installerer afhængigheder, kontrollerer TypeScript, bygger appen og publicerer kun `dist/`. Under **Settings → Pages → Build and deployment → Source** skal **GitHub Actions** være valgt.
+
+Adresse: https://s25787.github.io/Projekt-Arbejde---AI-underst-ttet-Adoption-og-onboarding/
+
+Buildet bruger relative filstier, så assets, manifest og service worker fungerer under repositoryets undermappe. Deployment kan også startes manuelt under **Actions → Deploy GitHub Pages → Run workflow**.
+
 Mobilførst, interaktiv mockup med HTML, CSS, Vanilla TypeScript og Vite. Storyboardet i brugerens første besked er den primære visuelle reference. Præsentationen var ikke tilgængelig i projektmappen, og brugeren bad derefter om at følge storyboardet alene.
 
 ## Kør og byg
